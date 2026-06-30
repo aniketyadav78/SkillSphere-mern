@@ -1,0 +1,17 @@
+# Dependencies
+client/node_modules/
+server/node_modules/
+node_modules/
+
+# Environment
+server/.env
+
+# Build
+client/dist/
+server/dist/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
