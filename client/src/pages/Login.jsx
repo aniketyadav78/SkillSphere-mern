@@ -1,10 +1,56 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from "react-icons/fa";
+
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!formData.email || !formData.password) {
+    return toast.error("Please fill all fields");
+  }
+
+  try {
+    setLoading(true);
+
+    const res = await axios.post(
+      "http://localhost:5000/api/auth/login",
+      formData
+    );
+
+    toast.success(res.data.message);
+
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("user", JSON.stringify(res.data.user));
+
+    navigate("/dashboard");
+
+  } catch (error) {
+    toast.error(
+      error.response?.data?.message || "Login Failed"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-600 to-indigo-700 flex items-center justify-center px-4">
 
@@ -18,8 +64,10 @@ function Login() {
           Login to your SkillSphere account
         </p>
 
-        <form className="mt-8 space-y-5">
-
+        <form
+  onSubmit={handleSubmit}
+  className="mt-8 space-y-5"
+>
           {/* Email */}
 
           <div>
@@ -28,13 +76,14 @@ function Login() {
             <div className="flex items-center border rounded-lg mt-2 px-3">
 
               <FaEnvelope className="text-gray-400" />
-
               <input
                 type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="Enter your email"
                 className="w-full p-3 outline-none"
               />
-
             </div>
           </div>
 
@@ -52,6 +101,9 @@ function Login() {
 
               <input
                 type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 placeholder="Enter password"
                 className="w-full p-3 outline-none"
               />
@@ -95,10 +147,12 @@ function Login() {
           {/* Button */}
 
           <button
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition"
-          >
-            Login
-          </button>
+  type="submit"
+  disabled={loading}
+  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition disabled:opacity-50"
+>
+  {loading ? "Logging in..." : "Login"}
+</button>
 
         </form>
 
