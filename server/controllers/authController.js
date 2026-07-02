@@ -8,7 +8,6 @@ const register = async (req, res) => {
   try {
     const { fullName, email, password, role, phone, location } = req.body;
 
-    // Validation
     if (!fullName || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -16,7 +15,6 @@ const register = async (req, res) => {
       });
     }
 
-    // Check existing user
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -26,10 +24,8 @@ const register = async (req, res) => {
       });
     }
 
-    // Hash Password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create User
     const user = await User.create({
       fullName,
       email,
@@ -39,7 +35,6 @@ const register = async (req, res) => {
       location,
     });
 
-    // Response without password
     res.status(201).json({
       success: true,
       message: "User Registered Successfully",
@@ -70,7 +65,6 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validation
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -78,7 +72,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Find User
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -88,7 +81,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Compare Password
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -98,7 +90,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Generate JWT
     const token = jwt.sign(
       {
         id: user._id,
@@ -111,7 +102,6 @@ const login = async (req, res) => {
       }
     );
 
-    // Success Response
     res.status(200).json({
       success: true,
       message: "Login Successful",
@@ -137,9 +127,38 @@ const login = async (req, res) => {
   }
 };
 
+// ================= GET PROFILE =================
+
+const getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      user,
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
 // ================= EXPORT =================
 
 module.exports = {
   register,
   login,
+  getProfile,
 };
