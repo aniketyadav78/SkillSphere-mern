@@ -1,3 +1,5 @@
+const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
@@ -155,10 +157,119 @@ const getProfile = async (req, res) => {
   }
 };
 
+// ================= UPDATE PROFILE =================
+
+const updateProfile = async (req, res) => {
+  try {
+    console.log("Request Body:", req.body);
+
+    const {
+      fullName,
+      phone,
+      location,
+      bio,
+      skills,
+      experience,
+      education,
+      github,
+      linkedin,
+    } = req.body;
+    
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    user.fullName = fullName || user.fullName;
+    user.phone = phone || user.phone;
+    user.location = location || user.location;
+    user.bio = bio || user.bio;
+    user.skills = skills || user.skills;
+    user.experience = experience || user.experience;
+    user.education = education || user.education;
+    user.github = github || user.github;
+    user.linkedin = linkedin || user.linkedin;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile Updated Successfully",
+      user,
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+
+// ================= UPLOAD PROFILE IMAGE =================
+
+const uploadProfileImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Please select an image",
+      });
+    }
+
+    const uploadFromBuffer = () => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "skillsphere/profile-images",
+          },
+          (error, result) => {
+            if (result) resolve(result);
+            else reject(error);
+          }
+        );
+
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+      });
+    };
+
+    const result = await uploadFromBuffer();
+
+    const user = await User.findById(req.user.id);
+
+    user.profileImage = result.secure_url;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile Image Uploaded Successfully",
+      image: result.secure_url,
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
 // ================= EXPORT =================
 
 module.exports = {
   register,
   login,
   getProfile,
+  updateProfile,
+  uploadProfileImage,
 };

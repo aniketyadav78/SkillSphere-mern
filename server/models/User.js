@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
+
+
+
     fullName: {
       type: String,
       required: true,
@@ -35,7 +38,35 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    skills: {
+      type: [String],
+      default: [],
+    },
 
+    bio: {
+      type: String,
+      default: "",
+    },
+
+    experience: {
+      type: String,
+      default: "",
+    },
+
+    education: {
+      type: String,
+      default: "",
+    },
+
+    github: {
+      type: String,
+      default: "",
+    },
+
+    linkedin: {
+      type: String,
+      default: "",
+    },
     profileImage: {
       type: String,
       default: "",

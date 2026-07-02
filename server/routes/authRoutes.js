@@ -1,18 +1,25 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  register,
-  login,
-  getProfile,
-} = require("../controllers/authController");
-
+const upload = require("../middleware/upload");
 const verifyToken = require("../middleware/authMiddleware");
 
-router.post("/register", register);
-router.post("/login", login);
+const authController = require("../controllers/authController");
 
-// Protected Route
-router.get("/profile", verifyToken, getProfile);
+// Authentication
+router.post("/register", authController.register);
+router.post("/login", authController.login);
+
+// Profile
+router.get("/profile", verifyToken, authController.getProfile);
+router.put("/update-profile", verifyToken, authController.updateProfile);
+
+// Upload Profile Image
+router.post(
+  "/upload-profile-image",
+  verifyToken,
+  upload.single("image"),
+  authController.uploadProfileImage
+);
 
 module.exports = router;
