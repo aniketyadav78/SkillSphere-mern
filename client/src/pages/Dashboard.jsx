@@ -95,11 +95,11 @@ function Dashboard() {
           color="text-green-600"
         />
 
-        <StatsCard
-          title="Resume"
-          value="No"
-          color="text-red-500"
-        />
+       <StatsCard
+  title="Resume"
+  value={user?.resume ? "Uploaded" : "Not Uploaded"}
+  color={user?.resume ? "text-green-600" : "text-red-500"}
+/>
 
         <StatsCard
           title="Profile"
@@ -123,7 +123,19 @@ function Dashboard() {
         >
           My Profile
         </button>
+        <button
+          onClick={() => navigate("/projects")}
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold"
+        >
+          My Projects
+        </button>
 
+        <button
+          onClick={() => navigate("/resume")}
+          className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg"
+        >
+          My Resume
+        </button>
         <button
           onClick={handleLogout}
           className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-semibold"

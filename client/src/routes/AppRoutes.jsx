@@ -5,7 +5,8 @@ import Register from "../pages/Register";
 import Dashboard from "../pages/Dashboard";
  import ProtectedRoute from "../components/ProtectedRoute";
 import Profile from "../pages/Profile";
-
+import Projects from "../pages/Projects";
+import Resume from "../pages/Resume";
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -17,7 +18,9 @@ function AppRoutes() {
   <ProtectedRoute>
     <Profile />
   </ProtectedRoute>
-} />
+} 
+
+/>
 
         <Route
           path="/dashboard"
@@ -27,6 +30,23 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+<Route
+  path="/resume"
+  element={
+    <ProtectedRoute>
+      <Resume />
+    </ProtectedRoute>
+  }
+/>
+        <Route
+  path="/projects"
+  element={
+    <ProtectedRoute>
+      <Projects />
+    </ProtectedRoute>
+  }
+/>
       </Routes>
     </BrowserRouter>
   );
